@@ -1,0 +1,3 @@
+[submodule "MugEngine"]
+	path = MugEngine
+	url = https://github.com/AugsEU/MugEngine

@@ -1,0 +1,75 @@
+{
+    "exclude": [
+        "obj/*",
+        "bin/*",
+        "*/*.dll",
+        "*/*.bat",
+        "*/*.aseprite"
+    ],
+
+    "logSkipped": true,
+
+    "overrides": 
+    {
+        "*/*.png": 
+        {
+            "processorParams": 
+            {
+                "PremultiplyAlpha": "False"
+            }
+        },
+        "*/*.wav": 
+        {
+            "processorParams": 
+            {
+                "Quality": "Best"
+            }
+        },
+        "*/*.txt": 
+        {
+            "copy": true
+        },
+        "*/*.mlo": 
+        {
+            "copy": true
+        },
+        "*/*.xml": 
+        {
+            "copy": true
+        },
+        "*/*.aux": 
+        {
+            "copy": true
+        },
+        "*/*.mia": 
+        {
+            "copy": true
+        },
+        "*/*.max": 
+        {
+            "copy": true
+        },
+        "*/*.mtn": 
+        {
+            "copy": true
+        },
+        "*/*.mtp": 
+        {
+            "copy": true
+        },
+        "*/*.mci": 
+        {
+            "copy": true
+        },
+        "*/*.ldtkl": 
+        {
+            "copy": true
+        },
+        "*/*.ldtk": 
+        {
+            "copy": true
+        }
+    },
+
+    "references": ["MonoGame.Extended.Content.Pipeline"]
+}

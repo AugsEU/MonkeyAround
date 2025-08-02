@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Tuning>
+  <Player>
+    <StandFriction type="Single">3486.641</StandFriction>
+    <DashSpeed type="Single">167.175</DashSpeed>
+    <DashInterruptTime type="Single">0.1</DashInterruptTime>
+    <DashTime type="Single">0.195</DashTime>
+    <DashEndMinSpeed type="Single">2.4</DashEndMinSpeed>
+    <DashEndFriction type="Single">900.4</DashEndFriction>
+    <RunSpeed type="Single">160.84</RunSpeed>
+    <RunEndMinSpeed type="Single">20.4</RunEndMinSpeed>
+    <RunEndFriction type="Single">600.4</RunEndFriction>
+    <JumpSquatFriction type="Single">10</JumpSquatFriction>
+    <JumpSquatTime type="Single">0.067</JumpSquatTime>
+    <JumpLandTime type="Single">0.4</JumpLandTime>
+    <JumpSpeed type="Single">297.118</JumpSpeed>
+    <JumpShortSpeed type="Single">245.801</JumpShortSpeed>
+    <DobuleJumpSpeed type="Single">300.458</DobuleJumpSpeed>
+    <Gravity type="Single">604.266</Gravity>
+    <FastFallGravity type="Single">161.908</FastFallGravity>
+    <FastFallThresh type="Single">-120</FastFallThresh>
+    <WallSlideMaxUpSpeed type="Single">162.479</WallSlideMaxUpSpeed>
+    <WallSlideFriction type="Single">341.106</WallSlideFriction>
+    <JumpInputBuffer type="Int32">10</JumpInputBuffer>
+    <AirDrift type="Single">554.711</AirDrift>
+    <AirDriftMax type="Single">181.679</AirDriftMax>
+  </Player>
+</Tuning>
