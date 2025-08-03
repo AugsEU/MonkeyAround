@@ -1,6 +1,6 @@
 # Monkeying Around  
 
-![Splash Art](/Splash Art.png)  
+![Splash Art](https://github.com/AugsEU/MonkeyAround/blob/master/Splash%20Art.png?raw=true)  
 
 Swing from tree trunk to tree trunk in this thrilling action non-adventure. You won't go anywhere doing this, but it might be fun!  
 
