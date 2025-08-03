@@ -21,6 +21,7 @@ class EmptyLevel : MLevel
 
 	public override void Draw(MScene scene, MDrawInfo info)
 	{
+		info.mCanvas.DrawRect(new Rectangle(-1000, -1000, 2000, 2000), new Color(152, 176, 57), Layer.BACKGROUND);
 	}
 
 	public override bool QueryCollides(Rectangle bounds, MCardDir travelDir, MCollisionFlags flags)

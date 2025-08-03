@@ -15,7 +15,7 @@ public class Main : MugMainGame
 	protected override void Initialize()
 	{
 		Window.AllowUserResizing = true;
-		Window.Title = "MonkeyAround";
+		Window.Title = "Monkeying Around";
 		Content.RootDirectory = "@Data";
 		
 
@@ -41,11 +41,10 @@ public class Main : MugMainGame
 			[
 				typeof(TitleScreen),
 				typeof(GameScreen),
-				typeof(WinScreen)
 			];
 
 
-		settings.mStartScreen = typeof(GameScreen);
+		settings.mStartScreen = typeof(TitleScreen);
 
 		return settings;
 	}

@@ -14,35 +14,50 @@ internal class Player : MSPlatformingActor
 	float mGrabInitAngle = 0.0f;
 	float mGrabSpinSpeed = 0.0f;
 
+	int mScoreDelta = 0;
+
+	MAnimation mFallAnim;
+	MAnimation mGrabAnim;
+	Texture2D mHandTex;
+	Texture2D mDeadTex;
+
+	bool mDead = false;
+
+	SoundEffect mBounceSFX;
+	SoundEffect mSwingSFX;
+	SoundEffect mJumpSFX;
+
 	public Player(Vector2 pos) : base()
 	{
 		mPosition = pos;
 		mSize = new Point(PLAYER_SIZE, PLAYER_SIZE);
+
+		mFallAnim = MData.I.LoadAnimation("Monkey/Monkey_Fall.max");
+		mGrabAnim = MData.I.LoadAnimation("Monkey/Monkey_Grab.max");
+
+		mHandTex = MData.I.Load<Texture2D>("Monkey/Hand");
+		mDeadTex = MData.I.Load<Texture2D>("Monkey/Dead");
+
+		mBounceSFX = MData.I.Load<SoundEffect>("Sounds/Bounce");
+		mSwingSFX = MData.I.Load<SoundEffect>("Sounds/VineSwing");
+		mJumpSFX = MData.I.Load<SoundEffect>("Sounds/Jump");
+
 	}
 
 	public override void Update(MUpdateInfo info)
 	{
+		mFallAnim.Update(info);
+		mGrabAnim.Update(info);
+
 		mGrabbing = MugInput.I.ButtonDown(GInput.Grab);
 
-		if (mGrabbedPeg is not null)
+		if(mDead)
 		{
-			float prevAngle = mGrabPegAngle;
+
+		}
+		else if (mGrabbedPeg is not null)
+		{
 			mGrabPegAngle += (mGrabClockwise ? 1.0f : -1.0f) * mGrabSpinSpeed * info.mDelta;
-
-			if((prevAngle > mGrabInitAngle && mGrabInitAngle > mGrabPegAngle) || 
-				(mGrabPegAngle > mGrabInitAngle && mGrabInitAngle > prevAngle))
-			{
-				int remaining = mGrabbedPeg.DecrementCount();
-				if(remaining <= 0)
-				{
-					ReleaseFromPeg(mGrabbedPeg);
-					mGrabbedPeg.Kill();
-					mGrabbedPeg = null;
-					return;
-				}
-
-				// Add score..
-			}
 
 			if (mGrabPegAngle > MathF.PI * 2.0f)
 			{
@@ -116,7 +131,7 @@ internal class Player : MSPlatformingActor
 		Vector2 com = GetCentreOfMass();
 		if (com.Y > 170.0f)
 		{
-			MScreenManager.I.ActivateScreen(typeof(GameScreen)); // Reload on death.
+			Kill();
 		}
 		else if (com.X > 120.0f)
 		{
@@ -124,9 +139,8 @@ internal class Player : MSPlatformingActor
 		}
 		else if (com.X < -120.0f)
 		{
-			mPosition.X = -1.0f - mPosition.X;
+			mPosition.X = -BoundsRect().Width-2.0f - mPosition.X;
 		}
-
 	}
 
 	bool GrabPegsInBox(Rectangle rect)
@@ -150,7 +164,9 @@ internal class Player : MSPlatformingActor
 				mGrabPegDist = pegToUs.Length();
 				mGrabClockwise = GetFacingDir() == MWalkDir.Left ? true : false;
 
-				mGrabSpinSpeed = Math.Max(7.0f, mVelocity.Length() / mGrabPegDist);
+				mGrabSpinSpeed = (Math.Max(7.0f, mVelocity.Length() / mGrabPegDist)) * 0.75f;
+
+				mSwingSFX.Play(0.6f, 1.0f, 0.0f);
 				return true;
 			}
 		}
@@ -167,11 +183,24 @@ internal class Player : MSPlatformingActor
 		if (!mGrabClockwise) shoot = -shoot;
 		float speed = MathF.Max(PLAYER_SPEED * 2.0f, mGrabSpinSpeed * mGrabPegDist * 1.30f);
 		mVelocity = shoot * speed;
+
+		int remaining = mGrabbedPeg.DecrementCount();
+		if (remaining <= 0)
+		{
+			mGrabbedPeg.Kill();
+		}
+
+		// Add Score
+		mScoreDelta += 1;
+
+		mJumpSFX.Play(1.0f, 0.4f, 0.0f);
+
+		mGrabbedPeg = null;
 	}
 
 	Rectangle CalcGrabBox()
 	{
-		const float BOX_DIST = 18.0f;
+		const float BOX_DIST = 16.0f;
 		const float BOX_SIZE = 6.0f;
 
 		Vector2 facing = GetFacingDir().ToVec();
@@ -185,7 +214,10 @@ internal class Player : MSPlatformingActor
 	{
 		if(solid is Trampoline tramp)
 		{
-			Jump(300.0f);
+			float speed = MathF.Max(mVelocity.Y, 300.0f);
+			Jump(speed);
+			tramp.HitTrampoline();
+			mBounceSFX.Play(1.0f, 0.4f, 0.0f);
 		}
 		else
 		{
@@ -193,13 +225,84 @@ internal class Player : MSPlatformingActor
 		}
 	}
 
+	public override void Kill()
+	{
+		mDead = true;
+	}
+
+	public bool IsDead()
+	{
+		return mDead;
+	}
+
+	public int GetScoreDelta()
+	{
+		int d = mScoreDelta;
+		mScoreDelta = 0;
+		return d;
+	}
+
 	public override void Draw(MDrawInfo info)
 	{
-		info.mCanvas.DrawRect(BoundsRect(), Color.Aqua, Layer.ENTITY);
-
-		if (mGrabbing)
+		MAnimation anim = mFallAnim;
+		if(mDead)
 		{
-			info.mCanvas.DrawRect(CalcGrabBox(), Color.Red, Layer.ENTITY);
+			DrawPlatformer(info, new MTexturePart(mDeadTex), Layer.ENTITY);
+			return;
+		}
+		else if(mGrabbedPeg is not null)
+		{
+			float ang = mGrabPegAngle - MathF.PI * 0.5f;
+			while (ang < 0.0f) ang += MathF.PI * 2.0f;
+			while (ang > MathF.PI * 2.0f) ang -= MathF.PI * 2.0f;
+
+			if (GetFacingDir() == MWalkDir.Right)
+			{
+				ang = MathF.PI * 2.0f - ang;
+			}
+
+			float animQuad = (ang - 0.001f) * 8.0f / (MathF.PI * 2.0f);
+			int animQuadInt = Math.Clamp((int)Math.Round(animQuad), 0, 7);
+
+			MTexturePart part = mGrabAnim.GetTexture(animQuadInt);
+			DrawPlatformer(info, part, Layer.ENTITY);
+		}
+		else
+		{
+			DrawPlatformer(info, mFallAnim.GetCurrentTexture(), Layer.ENTITY);
+		}
+		
+		if(mGrabbedPeg is not null)
+		{
+			Vector2 com = GetCentreOfMass();
+			Vector2 toPeg = mGrabbedPeg.GetCentreOfMass() - com;
+			Vector2 toPegNorm = toPeg / toPeg.Length();
+
+			Vector2 lineCenStart = com + toPegNorm * 8.0f;
+			Vector2 lineCenEnd = lineCenStart + toPegNorm * (mGrabPegDist - 20.0f);
+
+			Vector2 line1Start = lineCenStart + toPegNorm.Perpendicular() * 2.0f;
+			Vector2 line1End = lineCenEnd + toPegNorm.Perpendicular() * 2.0f;
+
+			Vector2 line2Start = lineCenStart - toPegNorm.Perpendicular() * 2.0f;
+			Vector2 line2End = lineCenEnd - toPegNorm.Perpendicular() * 2.0f;
+
+			info.mCanvas.DrawLine(line1Start, line1End, new Color(15, 56, 15), 1.0f, Layer.ENTITY);
+			info.mCanvas.DrawLine(line2Start, line2End, new Color(15, 56, 15), 1.0f, Layer.ENTITY);
+		}
+		else if (mGrabbing)
+		{
+			Rectangle grabBox = CalcGrabBox();
+			Vector2 pos = grabBox.Location.ToVector2();
+			pos.X -= 2.0f;
+			SpriteEffects effect = SpriteEffects.None;
+			if(GetFacingDir() == MWalkDir.Left)
+			{
+				//pos.X -= mHandTex.Width;
+				effect = SpriteEffects.FlipHorizontally;
+			}
+			info.mCanvas.DrawTexture(mHandTex, pos, effect, Layer.ENTITY);
+			//info.mCanvas.DrawRect(CalcGrabBox(), Color.Red, Layer.ENTITY);
 		}
 	}
 }
