@@ -4,7 +4,7 @@
 	{
 		MoveLeft,
 		MoveRight,
-		Jump,
+		Grab,
 		Confirm,
 	}
 
@@ -17,7 +17,7 @@
 			MugInput.I.BindButton(GInput.MoveRight, new MKeyboardButton(Keys.Right), new MKeyboardButton(Keys.D));
 
 			// Jump
-			MugInput.I.BindButton(GInput.Jump, new MKeyboardButton(Keys.Space));
+			MugInput.I.BindButton(GInput.Grab, new MKeyboardButton(Keys.Space));
 
 			// Confirm
 			MugInput.I.BindButton(GInput.Confirm, new MKeyboardButton(Keys.Enter));

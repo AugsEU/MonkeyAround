@@ -26,7 +26,7 @@ public class Main : MugMainGame
 
 #if DEBUG
 		DRectLayer.NameLayers();
-		InitTuner<Tune>(Tuning.I, "@Data/Tune/Values.xml");
+		//InitTuner<Tune>(Tuning.I, "@Data/Tune/Values.xml");
 #endif // DEBUG
 	}
 
@@ -35,7 +35,7 @@ public class Main : MugMainGame
 		MugEngineSettings settings = new MugEngineSettings();
 		settings.mFPS = 60;
 		settings.mNumLayers = Layer.MAX_LAYERS;
-		settings.mResolution = new Point(640, 360);
+		settings.mResolution = new Point(200, 320);
 
 		settings.mScreenTypes =
 			[
@@ -45,7 +45,7 @@ public class Main : MugMainGame
 			];
 
 
-		settings.mStartScreen = typeof(TitleScreen);
+		settings.mStartScreen = typeof(GameScreen);
 
 		return settings;
 	}
